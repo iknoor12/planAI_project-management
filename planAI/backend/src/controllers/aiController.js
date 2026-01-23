@@ -1,12 +1,6 @@
 import { generateTasksWithAI, generateSubtasksWithAI, analyzeTaskDelaysWithAI } from '../services/aiService.js';
 
 /**
- * AI Controller
- * Handles AI-powered features using OpenAI API
- */
-
-/**
- * @desc    Generate tasks using AI based on project description
  * @route   POST /api/ai/generate-tasks
  * @access  Private
  */
@@ -31,7 +25,6 @@ export const generateTasks = async (req, res) => {
 };
 
 /**
- * @desc    Generate subtasks for a task using AI
  * @route   POST /api/ai/generate-subtasks
  * @access  Private
  */
@@ -56,7 +49,6 @@ export const generateSubtasks = async (req, res) => {
 };
 
 /**
- * @desc    Analyze task delays and get AI suggestions
  * @route   POST /api/ai/analyze-delays
  * @access  Private
  */
@@ -81,7 +73,6 @@ export const analyzeDelays = async (req, res) => {
 };
 
 /**
- * @desc    General AI chat for project assistance
  * @route   POST /api/ai/chat
  * @access  Private
  */
@@ -93,7 +84,6 @@ export const aiChat = async (req, res) => {
       return res.status(400).json({ message: 'Please provide a message' });
     }
 
-    // Check if OpenAI is configured
     const { default: openai } = await import('../config/openai.js');
     if (!openai) {
       return res.status(503).json({ 
@@ -102,7 +92,6 @@ export const aiChat = async (req, res) => {
       });
     }
 
-    // This is a simple implementation - you can expand with conversation history
     const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [

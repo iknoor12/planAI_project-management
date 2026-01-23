@@ -6,10 +6,6 @@ import Dashboard from './pages/Dashboard';
 import ProjectBoard from './pages/ProjectBoard';
 import './styles/App.css';
 
-/**
- * Protected Route Component
- * Redirects to login if user is not authenticated
- */
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -20,10 +16,6 @@ const ProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
-/**
- * Public Route Component
- * Redirects to dashboard if user is already authenticated
- */
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -34,10 +26,6 @@ const PublicRoute = ({ children }) => {
   return !isAuthenticated ? children : <Navigate to="/dashboard" />;
 };
 
-/**
- * Main App Component
- * Handles routing and authentication flow
- */
 function App() {
   return (
     <AuthProvider>

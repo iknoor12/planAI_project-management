@@ -2,12 +2,6 @@ import Project from '../models/Project.js';
 import Task from '../models/Task.js';
 
 /**
- * Project Controller
- * Handles CRUD operations for projects
- */
-
-/**
- * @desc    Get all projects for logged-in user
  * @route   GET /api/projects
  * @access  Private
  */
@@ -28,7 +22,6 @@ export const getProjects = async (req, res) => {
 };
 
 /**
- * @desc    Get single project by ID
  * @route   GET /api/projects/:id
  * @access  Private
  */
@@ -42,7 +35,6 @@ export const getProjectById = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    // Check if user is a member
     if (!project.members.some((member) => member._id.equals(req.user._id))) {
       return res.status(403).json({ message: 'Not authorized to access this project' });
     }
@@ -55,7 +47,6 @@ export const getProjectById = async (req, res) => {
 };
 
 /**
- * @desc    Create a new project
  * @route   POST /api/projects
  * @access  Private
  */
@@ -87,7 +78,6 @@ export const createProject = async (req, res) => {
 };
 
 /**
- * @desc    Update a project
  * @route   PUT /api/projects/:id
  * @access  Private
  */
@@ -124,7 +114,6 @@ export const updateProject = async (req, res) => {
 };
 
 /**
- * @desc    Delete a project
  * @route   DELETE /api/projects/:id
  * @access  Private
  */
@@ -141,7 +130,6 @@ export const deleteProject = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to delete this project' });
     }
 
-    // Delete all tasks associated with this project
     await Task.deleteMany({ project: req.params.id });
 
     await project.deleteOne();

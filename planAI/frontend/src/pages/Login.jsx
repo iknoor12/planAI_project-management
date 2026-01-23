@@ -3,10 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Auth.css';
 
-/**
- * Login Page
- * User authentication page
- */
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',

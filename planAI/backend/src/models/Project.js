@@ -1,9 +1,5 @@
 import mongoose from 'mongoose';
 
-/**
- * Project Model
- * Represents a project containing multiple tasks
- */
 const projectSchema = new mongoose.Schema(
   {
     name: {
@@ -29,7 +25,7 @@ const projectSchema = new mongoose.Schema(
     ],
     color: {
       type: String,
-      default: '#3b82f6', // Default blue color
+      default: '#3b82f6',
     },
   },
   {
@@ -37,7 +33,6 @@ const projectSchema = new mongoose.Schema(
   }
 );
 
-// Automatically add owner to members on creation
 projectSchema.pre('save', function (next) {
   if (this.isNew && !this.members.includes(this.owner)) {
     this.members.push(this.owner);

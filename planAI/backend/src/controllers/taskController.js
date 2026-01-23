@@ -2,12 +2,6 @@ import Task from '../models/Task.js';
 import Project from '../models/Project.js';
 
 /**
- * Task Controller
- * Handles CRUD operations for tasks
- */
-
-/**
- * @desc    Get all tasks for a project
  * @route   GET /api/tasks/project/:projectId
  * @access  Private
  */
@@ -15,7 +9,6 @@ export const getTasksByProject = async (req, res) => {
   try {
     const { projectId } = req.params;
 
-    // Check if user has access to this project
     const project = await Project.findById(projectId);
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
@@ -38,7 +31,6 @@ export const getTasksByProject = async (req, res) => {
 };
 
 /**
- * @desc    Get single task by ID
  * @route   GET /api/tasks/:id
  * @access  Private
  */
@@ -53,7 +45,6 @@ export const getTaskById = async (req, res) => {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    // Check if user has access to the project
     const project = await Project.findById(task.project._id);
     if (!project.members.some((member) => member.equals(req.user._id))) {
       return res.status(403).json({ message: 'Not authorized to access this task' });
@@ -67,7 +58,6 @@ export const getTaskById = async (req, res) => {
 };
 
 /**
- * @desc    Create a new task
  * @route   POST /api/tasks
  * @access  Private
  */
@@ -79,7 +69,6 @@ export const createTask = async (req, res) => {
       return res.status(400).json({ message: 'Please provide title and project' });
     }
 
-    // Check if user has access to this project
     const projectDoc = await Project.findById(project);
     if (!projectDoc) {
       return res.status(404).json({ message: 'Project not found' });
@@ -113,7 +102,6 @@ export const createTask = async (req, res) => {
 };
 
 /**
- * @desc    Update a task
  * @route   PUT /api/tasks/:id
  * @access  Private
  */
@@ -125,7 +113,6 @@ export const updateTask = async (req, res) => {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    // Check if user has access to the project
     const project = await Project.findById(task.project);
     if (!project.members.some((member) => member.equals(req.user._id))) {
       return res.status(403).json({ message: 'Not authorized to update this task' });
@@ -156,7 +143,6 @@ export const updateTask = async (req, res) => {
 };
 
 /**
- * @desc    Delete a task
  * @route   DELETE /api/tasks/:id
  * @access  Private
  */
@@ -168,7 +154,6 @@ export const deleteTask = async (req, res) => {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    // Check if user has access to the project
     const project = await Project.findById(task.project);
     if (!project.members.some((member) => member.equals(req.user._id))) {
       return res.status(403).json({ message: 'Not authorized to delete this task' });
@@ -184,7 +169,6 @@ export const deleteTask = async (req, res) => {
 };
 
 /**
- * @desc    Get dashboard statistics
  * @route   GET /api/tasks/stats/:projectId
  * @access  Private
  */
@@ -192,7 +176,6 @@ export const getTaskStats = async (req, res) => {
   try {
     const { projectId } = req.params;
 
-    // Check if user has access to this project
     const project = await Project.findById(projectId);
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });

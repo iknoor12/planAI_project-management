@@ -3,10 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Auth.css';
 
-/**
- * Register Page
- * User registration page
- */
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -31,7 +27,6 @@ const Register = () => {
     e.preventDefault();
     setError('');
 
-    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;

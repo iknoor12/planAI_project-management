@@ -5,10 +5,6 @@ import { useAuth } from '../context/AuthContext';
 import { getProjects, createProject, deleteProject } from '../api/projectApi';
 import '../styles/Dashboard.css';
 
-/**
- * Dashboard Page
- * Main dashboard showing all user projects
- */
 const Dashboard = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,8 +26,6 @@ const Dashboard = () => {
     try {
       const data = await getProjects();
       setProjects(data);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
     } finally {
       setLoading(false);
     }
@@ -45,7 +39,6 @@ const Dashboard = () => {
       setNewProject({ name: '', description: '', color: '#3b82f6' });
       setShowCreateModal(false);
     } catch (error) {
-      console.error('Error creating project:', error);
       alert('Failed to create project');
     }
   };
@@ -57,7 +50,6 @@ const Dashboard = () => {
       await deleteProject(projectId);
       setProjects(projects.filter((p) => p._id !== projectId));
     } catch (error) {
-      console.error('Error deleting project:', error);
       alert('Failed to delete project');
     }
   };

@@ -1,12 +1,6 @@
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
-/**
- * Database Connection Configuration
- * Connects to MongoDB using Mongoose
- * Uses MongoDB Memory Server for development when no MONGO_URI is provided
- */
-
 let mongoServer;
 
 const connectDB = async () => {
@@ -18,16 +12,12 @@ const connectDB = async () => {
       if (!mongoServer) {
         mongoServer = await MongoMemoryServer.create();
         mongoUri = mongoServer.getUri();
-        console.log('🧪 Using in-memory MongoDB for development');
       }
     }
 
-    const conn = await mongoose.connect(mongoUri);
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    await mongoose.connect(mongoUri);
   } catch (error) {
-    console.error(`❌ MongoDB Connection Error: ${error.message}`);
-    // Continue running even if DB connection fails for demo purposes
-    console.log('⚠️  Running in limited mode without database persistence');
+    console.error(`MongoDB Connection Error: ${error.message}`);
   }
 };
 

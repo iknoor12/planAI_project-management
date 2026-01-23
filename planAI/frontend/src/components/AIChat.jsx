@@ -3,10 +3,6 @@ import { FiSend, FiLoader } from 'react-icons/fi';
 import { chatWithAI, generateTasks, generateSubtasks } from '../api/aiApi';
 import '../styles/AIChat.css';
 
-/**
- * AIChat Component
- * AI assistant chat interface for project management help
- */
 const AIChat = ({ projectContext, onTasksGenerated, onSubtasksGenerated }) => {
   const [messages, setMessages] = useState([
     {
@@ -26,7 +22,6 @@ const AIChat = ({ projectContext, onTasksGenerated, onSubtasksGenerated }) => {
     setLoading(true);
 
     try {
-      // Check if user wants to generate tasks
       if (input.toLowerCase().includes('generate task') || input.toLowerCase().includes('create task')) {
         const response = await generateTasks(input, projectContext);
         const aiMessage = {
@@ -40,7 +35,6 @@ const AIChat = ({ projectContext, onTasksGenerated, onSubtasksGenerated }) => {
           onTasksGenerated(response.tasks);
         }
       } else if (input.toLowerCase().includes('subtask') || input.toLowerCase().includes('break down')) {
-        // Extract task title from input (simplified)
         const taskTitle = input.replace(/generate subtasks?|break down|for|the task/gi, '').trim();
         if (taskTitle) {
           const response = await generateSubtasks(taskTitle);
@@ -61,13 +55,11 @@ const AIChat = ({ projectContext, onTasksGenerated, onSubtasksGenerated }) => {
           }]);
         }
       } else {
-        // Regular chat
         const response = await chatWithAI(input, projectContext);
         const aiMessage = { role: 'assistant', content: response.reply };
         setMessages((prev) => [...prev, aiMessage]);
       }
     } catch (error) {
-      console.error('AI chat error:', error);
       setMessages((prev) => [
         ...prev,
         {

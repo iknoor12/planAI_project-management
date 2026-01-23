@@ -1,10 +1,6 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import { login as loginApi, register as registerApi, logout as logoutApi, getStoredUser } from '../api/authApi';
 
-/**
- * Auth Context
- * Manages authentication state across the application
- */
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {

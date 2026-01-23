@@ -3,10 +3,6 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import TaskCard from './TaskCard';
 import '../styles/KanbanBoard.css';
 
-/**
- * KanbanBoard Component
- * Displays tasks in a kanban board layout with drag and drop
- */
 const KanbanBoard = ({ tasks, onTaskUpdate, onTaskEdit, onTaskDelete }) => {
   const [columns, setColumns] = useState({
     todo: [],
@@ -15,7 +11,6 @@ const KanbanBoard = ({ tasks, onTaskUpdate, onTaskEdit, onTaskDelete }) => {
   });
 
   useEffect(() => {
-    // Organize tasks by status
     const organized = {
       todo: tasks.filter((t) => t.status === 'todo'),
       'in-progress': tasks.filter((t) => t.status === 'in-progress'),
@@ -27,10 +22,8 @@ const KanbanBoard = ({ tasks, onTaskUpdate, onTaskEdit, onTaskDelete }) => {
   const onDragEnd = async (result) => {
     const { source, destination, draggableId } = result;
 
-    // Dropped outside a droppable area
     if (!destination) return;
 
-    // No change in position
     if (
       source.droppableId === destination.droppableId &&
       source.index === destination.index
@@ -42,7 +35,6 @@ const KanbanBoard = ({ tasks, onTaskUpdate, onTaskEdit, onTaskDelete }) => {
     const destColumn = columns[destination.droppableId];
     const task = sourceColumn.find((t) => t._id === draggableId);
 
-    // Moving within the same column
     if (source.droppableId === destination.droppableId) {
       const newColumn = Array.from(sourceColumn);
       newColumn.splice(source.index, 1);
@@ -53,7 +45,6 @@ const KanbanBoard = ({ tasks, onTaskUpdate, onTaskEdit, onTaskDelete }) => {
         [source.droppableId]: newColumn,
       });
     } else {
-      // Moving to a different column
       const newSourceColumn = Array.from(sourceColumn);
       const newDestColumn = Array.from(destColumn);
 
@@ -66,7 +57,6 @@ const KanbanBoard = ({ tasks, onTaskUpdate, onTaskEdit, onTaskDelete }) => {
         [destination.droppableId]: newDestColumn,
       });
 
-      // Update task status on backend
       await onTaskUpdate(task._id, { status: destination.droppableId });
     }
   };

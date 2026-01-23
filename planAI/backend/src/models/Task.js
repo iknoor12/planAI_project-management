@@ -1,9 +1,5 @@
 import mongoose from 'mongoose';
 
-/**
- * Task Model
- * Represents an individual task within a project
- */
 const taskSchema = new mongoose.Schema(
   {
     title: {
@@ -67,7 +63,6 @@ const taskSchema = new mongoose.Schema(
   }
 );
 
-// Index for efficient queries
 taskSchema.index({ project: 1, status: 1 });
 taskSchema.index({ assignedTo: 1 });
 

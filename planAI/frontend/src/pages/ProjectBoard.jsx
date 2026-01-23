@@ -8,10 +8,6 @@ import { getProjectById } from '../api/projectApi';
 import { getTasksByProject, createTask, updateTask, deleteTask, getTaskStats } from '../api/taskApi';
 import '../styles/ProjectBoard.css';
 
-/**
- * ProjectBoard Page
- * Main project view with kanban board, stats, and AI assistant
- */
 const ProjectBoard = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
@@ -46,7 +42,6 @@ const ProjectBoard = () => {
       setTasks(tasksData);
       setStats(statsData);
     } catch (error) {
-      console.error('Error fetching project data:', error);
       alert('Failed to load project');
       navigate('/dashboard');
     } finally {
@@ -64,9 +59,8 @@ const ProjectBoard = () => {
       setTasks([...tasks, newTask]);
       setTaskForm({ title: '', description: '', priority: 'medium', dueDate: '', status: 'todo' });
       setShowTaskModal(false);
-      fetchProjectData(); // Refresh stats
+      fetchProjectData();
     } catch (error) {
-      console.error('Error creating task:', error);
       alert('Failed to create task');
     }
   };
@@ -79,9 +73,8 @@ const ProjectBoard = () => {
       setEditingTask(null);
       setTaskForm({ title: '', description: '', priority: 'medium', dueDate: '', status: 'todo' });
       setShowTaskModal(false);
-      fetchProjectData(); // Refresh stats
+      fetchProjectData();
     } catch (error) {
-      console.error('Error updating task:', error);
       alert('Failed to update task');
     }
   };
@@ -90,10 +83,8 @@ const ProjectBoard = () => {
     try {
       const updated = await updateTask(taskId, updates);
       setTasks(tasks.map((t) => (t._id === updated._id ? updated : t)));
-      fetchProjectData(); // Refresh stats
-    } catch (error) {
-      console.error('Error updating task:', error);
-    }
+      fetchProjectData();
+    } catch (error) {}
   };
 
   const handleDeleteTask = async (taskId) => {
@@ -102,9 +93,8 @@ const ProjectBoard = () => {
     try {
       await deleteTask(taskId);
       setTasks(tasks.filter((t) => t._id !== taskId));
-      fetchProjectData(); // Refresh stats
+      fetchProjectData();
     } catch (error) {
-      console.error('Error deleting task:', error);
       alert('Failed to delete task');
     }
   };
@@ -122,7 +112,6 @@ const ProjectBoard = () => {
   };
 
   const handleTasksGenerated = async (generatedTasks) => {
-    // AI generated tasks can be bulk created
     try {
       const promises = generatedTasks.map((task) =>
         createTask({
@@ -134,10 +123,8 @@ const ProjectBoard = () => {
       );
       const newTasks = await Promise.all(promises);
       setTasks([...tasks, ...newTasks]);
-      fetchProjectData(); // Refresh stats
-    } catch (error) {
-      console.error('Error creating AI tasks:', error);
-    }
+      fetchProjectData();
+    } catch (error) {}
   };
 
   if (loading) {
