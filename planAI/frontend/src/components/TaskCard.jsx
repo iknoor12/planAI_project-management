@@ -7,7 +7,7 @@ import '../styles/TaskCard.css';
  * TaskCard Component
  * Displays individual task information with actions
  */
-const TaskCard = ({ task, onEdit, onDelete, provided }) => {
+const TaskCard = ({ task, onEdit, onDelete, provided, snapshot }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   const getPriorityColor = (priority) => {
@@ -31,7 +31,7 @@ const TaskCard = ({ task, onEdit, onDelete, provided }) => {
       ref={provided?.innerRef}
       {...provided?.draggableProps}
       {...provided?.dragHandleProps}
-      className={`task-card ${isOverdue ? 'overdue' : ''}`}
+      className={`task-card ${isOverdue ? 'overdue' : ''} ${snapshot?.isDragging ? 'dragging' : ''}`}
     >
       <div className="task-header">
         <h4>{task.title}</h4>

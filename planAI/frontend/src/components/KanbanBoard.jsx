@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import TaskCard from './TaskCard';
 import '../styles/KanbanBoard.css';
 
@@ -11,10 +11,13 @@ const KanbanBoard = ({ tasks, onTaskUpdate, onTaskEdit, onTaskDelete }) => {
   });
 
   useEffect(() => {
+    const sortByPosition = (list) =>
+      [...list].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+
     const organized = {
-      todo: tasks.filter((t) => t.status === 'todo'),
-      'in-progress': tasks.filter((t) => t.status === 'in-progress'),
-      done: tasks.filter((t) => t.status === 'done'),
+      todo: sortByPosition(tasks.filter((t) => t.status === 'todo')),
+      'in-progress': sortByPosition(tasks.filter((t) => t.status === 'in-progress')),
+      done: sortByPosition(tasks.filter((t) => t.status === 'done')),
     };
     setColumns(organized);
   }, [tasks]);
@@ -44,6 +47,14 @@ const KanbanBoard = ({ tasks, onTaskUpdate, onTaskEdit, onTaskDelete }) => {
         ...columns,
         [source.droppableId]: newColumn,
       });
+
+      try {
+        await Promise.all(
+          newColumn.map((item, index) =>
+            onTaskUpdate(item._id, { position: index })
+          )
+        );
+      } catch (error) {}
     } else {
       const newSourceColumn = Array.from(sourceColumn);
       const newDestColumn = Array.from(destColumn);
@@ -57,7 +68,20 @@ const KanbanBoard = ({ tasks, onTaskUpdate, onTaskEdit, onTaskDelete }) => {
         [destination.droppableId]: newDestColumn,
       });
 
-      await onTaskUpdate(task._id, { status: destination.droppableId });
+      try {
+        await Promise.all([
+          ...newSourceColumn.map((item, index) =>
+            onTaskUpdate(item._id, { position: index })
+          ),
+          ...newDestColumn.map((item, index) => {
+            const updates = { position: index };
+            if (item._id === draggableId) {
+              updates.status = destination.droppableId;
+            }
+            return onTaskUpdate(item._id, updates);
+          }),
+        ]);
+      } catch (error) {}
     }
   };
 
@@ -95,12 +119,13 @@ const KanbanBoard = ({ tasks, onTaskUpdate, onTaskEdit, onTaskDelete }) => {
                       draggableId={task._id}
                       index={index}
                     >
-                      {(provided) => (
+                      {(provided, snapshot) => (
                         <TaskCard
                           task={task}
                           onEdit={onTaskEdit}
                           onDelete={onTaskDelete}
                           provided={provided}
+                          snapshot={snapshot}
                         />
                       )}
                     </Draggable>

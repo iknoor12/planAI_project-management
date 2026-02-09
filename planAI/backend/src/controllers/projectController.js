@@ -1,5 +1,6 @@
 import Project from '../models/Project.js';
 import Task from '../models/Task.js';
+import { generateTasksWithAI } from '../services/aiService.js';
 
 /**
  * @route   GET /api/projects
@@ -65,6 +66,31 @@ export const createProject = async (req, res) => {
       owner: req.user._id,
       members: [req.user._id],
     });
+
+    let aiTasks = [];
+    try {
+      const prompt = `${name}${description ? ` - ${description}` : ''}`;
+      const generated = await generateTasksWithAI(prompt, 'Generate initial tasks for this new project.');
+      if (Array.isArray(generated)) {
+        aiTasks = generated;
+      }
+    } catch (error) {
+      console.error('AI default task generation error:', error);
+    }
+
+    const defaultTasks = aiTasks.map((task, index) => ({
+      title: task.title,
+      description: task.description || '',
+      priority: task.priority || 'medium',
+      status: 'todo',
+      project: project._id,
+      createdBy: req.user._id,
+      position: index,
+    }));
+
+    if (defaultTasks.length > 0) {
+      await Task.insertMany(defaultTasks);
+    }
 
     const populatedProject = await Project.findById(project._id)
       .populate('owner', 'name email')
