@@ -47,6 +47,38 @@
   margin-bottom: 1.25rem;
 }
 
+.password-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input input {
+  width: 100%;
+  padding-right: 3rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  color: #6b7280;
+}
+
+.password-toggle svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  fill: currentColor;
+}
+
+.password-toggle:focus {
+  outline: none;
+}
+
 .auth-form button[type="submit"] {
   width: 100%;
   padding: 1rem;
