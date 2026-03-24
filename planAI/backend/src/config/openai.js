@@ -1,12 +1,23 @@
-import OpenAI from "openai";
 
-let openai = null;
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Initialize OpenAI client if API key is available
-if (process.env.OPENAI_API_KEY) {
-  openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
+const apiKey = "AIzaSyCOg3O2FqylFUFBjjYPxlhXr3M6AbrKogo";
+
+if (!apiKey) {
+  console.warn('⚠️  GOOGLE_GENAI_API_KEY not set in .env file');
 }
 
-export default openai;
+const genai = new GoogleGenerativeAI(apiKey);
+
+async function invokeGenAI() {
+  try {
+    const model = genai.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const result = await model.generateContent("what is the ?");
+    const response = await result.response;
+    console.log('✅ Gemini Response:', response.text());
+  } catch (error) {
+    console.error('❌ Gemini API Error:', error.message);
+  }
+}
+
+export default invokeGenAI;
