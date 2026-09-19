@@ -1,6 +1,10 @@
 import User from '../models/User.js';
 import { generateToken } from '../middleware/authMiddleware.js';
 
+const normalizeEmail = (email) => (
+  typeof email === 'string' ? email.trim().toLowerCase() : ''
+);
+
 /**
  * @route   POST /api/auth/register
  * @access  Public
@@ -8,19 +12,20 @@ import { generateToken } from '../middleware/authMiddleware.js';
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
-    if (!name || !email || !password) {
+    if (!name || !normalizedEmail || !password) {
       return res.status(400).json({ message: 'Please provide all fields' });
     }
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: normalizedEmail });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password,
     });
 
@@ -47,12 +52,13 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
-    if (!email || !password) {
+    if (!normalizedEmail || !password) {
       return res.status(400).json({ message: 'Please provide email and password' });
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
 
     if (user && (await user.matchPassword(password))) {
       res.json({

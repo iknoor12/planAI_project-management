@@ -6,7 +6,7 @@ import projectRoutes from './routes/projectRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 
-import openai from './config/openai.js';
+// import invokeGemini from './config/gemini.js';
 
 const app = express();
 
@@ -39,6 +39,6 @@ app.use((err, req, res, next) => {
 });
 
 // Invoke Gemini AI
-openai().catch(err => console.error('Gemini API Error:', err));
+// invokeGemini(prompt).catch(err => console.error('Gemini API Error:', err));
 
 export default app;

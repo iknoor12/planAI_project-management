@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FiSend, FiLoader } from 'react-icons/fi';
-import { chatWithAI, generateTasks, generateSubtasks } from '../api/aiApi';
+import { chatWithAI } from '../api/aiApi';
 import '../styles/AIChat.css';
 
 const AIChat = ({ projectContext, onTasksGenerated, onSubtasksGenerated }) => {
@@ -22,49 +22,33 @@ const AIChat = ({ projectContext, onTasksGenerated, onSubtasksGenerated }) => {
     setLoading(true);
 
     try {
-      if (input.toLowerCase().includes('generate task') || input.toLowerCase().includes('create task')) {
-        const response = await generateTasks(input, projectContext);
-        const aiMessage = {
-          role: 'assistant',
-          content: `I've generated ${response.tasks.length} tasks based on your request. Would you like me to add them to your project?`,
-          tasks: response.tasks,
-        };
-        setMessages((prev) => [...prev, aiMessage]);
-        
-        if (onTasksGenerated) {
-          onTasksGenerated(response.tasks);
-        }
-      } else if (input.toLowerCase().includes('subtask') || input.toLowerCase().includes('break down')) {
-        const taskTitle = input.replace(/generate subtasks?|break down|for|the task/gi, '').trim();
-        if (taskTitle) {
-          const response = await generateSubtasks(taskTitle);
-          const aiMessage = {
-            role: 'assistant',
-            content: `Here are suggested subtasks for "${taskTitle}":`,
-            subtasks: response.subtasks,
-          };
-          setMessages((prev) => [...prev, aiMessage]);
-          
-          if (onSubtasksGenerated) {
-            onSubtasksGenerated(response.subtasks);
-          }
-        } else {
-          setMessages((prev) => [...prev, {
-            role: 'assistant',
-            content: 'Please specify which task you\'d like me to break down into subtasks.',
-          }]);
-        }
-      } else {
-        const response = await chatWithAI(input, projectContext);
-        const aiMessage = { role: 'assistant', content: response.reply };
-        setMessages((prev) => [...prev, aiMessage]);
+      const response = await chatWithAI(input, projectContext);
+      const aiMessage = {
+        role: 'assistant',
+        content: response.reply,
+        tasks: response.tasks || null,
+        subtasks: response.subtasks || null,
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+
+      if (response.tasks && onTasksGenerated) {
+        onTasksGenerated(response.tasks);
       }
+
+      if (response.subtasks && onSubtasksGenerated) {
+        onSubtasksGenerated(response.subtasks);
+      }
+
     } catch (error) {
+      const errorMessage = error.response?.data?.message
+        || 'The AI assistant is temporarily unavailable. Please try again shortly.';
+
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: 'Sorry, I encountered an error. Please try again or check your OpenAI API configuration.',
+          content: errorMessage,
         },
       ]);
     } finally {
@@ -72,7 +56,7 @@ const AIChat = ({ projectContext, onTasksGenerated, onSubtasksGenerated }) => {
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -125,7 +109,7 @@ const AIChat = ({ projectContext, onTasksGenerated, onSubtasksGenerated }) => {
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyDown}
           placeholder="Ask me anything about your project..."
           disabled={loading}
           rows="2"

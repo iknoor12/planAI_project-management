@@ -71,9 +71,7 @@ export const createProject = async (req, res) => {
     try {
       const prompt = `${name}${description ? ` - ${description}` : ''}`;
       const generated = await generateTasksWithAI(prompt, 'Generate initial tasks for this new project.');
-      if (Array.isArray(generated)) {
-        aiTasks = generated;
-      }
+      aiTasks = generated.tasks;
     } catch (error) {
       console.error('AI default task generation error:', error);
     }

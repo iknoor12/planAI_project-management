@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   generateTasks,
+  generateProjectTasks,
   generateSubtasks,
   analyzeDelays,
   aiChat,
@@ -17,6 +18,7 @@ const router = express.Router();
 router.use(protect);
 
 router.post('/generate-tasks', generateTasks);
+router.post('/projects/:projectId/generate-tasks', generateProjectTasks);
 router.post('/generate-subtasks', generateSubtasks);
 router.post('/analyze-delays', analyzeDelays);
 router.post('/chat', aiChat);

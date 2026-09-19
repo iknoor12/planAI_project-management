@@ -21,14 +21,14 @@ A modern, full-stack project management application with AI capabilities, built 
 - **Node.js** & **Express**: Server framework
 - **MongoDB** & **Mongoose**: Database and ODM
 - **JWT**: Authentication
-- **OpenAI API**: AI-powered features
+- **Google Gemini API**: AI-powered features
 - **bcryptjs**: Password hashing
 
 ### Frontend
 - **React 18**: UI library
 - **Vite**: Build tool and dev server
 - **React Router**: Client-side routing
-- **React Beautiful DnD**: Drag and drop
+- **@hello-pangea/dnd**: Drag and drop
 - **Axios**: HTTP client
 - **date-fns**: Date formatting
 
@@ -40,7 +40,7 @@ planAI/
 │   ├── src/
 │   │   ├── config/
 │   │   │   ├── db.js              # MongoDB connection
-│   │   │   └── openai.js          # OpenAI configuration
+│   │   │   └── gemini.js          # Gemini configuration
 │   │   ├── controllers/
 │   │   │   ├── authController.js   # Authentication logic
 │   │   │   ├── projectController.js # Project CRUD
@@ -98,7 +98,7 @@ planAI/
 
 - **Node.js** (v16 or higher)
 - **MongoDB** (v5 or higher) - Running locally or MongoDB Atlas
-- **OpenAI API Key** - Get from [OpenAI Platform](https://platform.openai.com)
+- **Google Gemini API key** - Get from [Google AI Studio](https://aistudio.google.com/apikey)
 
 ### Installation
 
@@ -124,7 +124,7 @@ cp .env.example .env
 # Required variables:
 # - MONGO_URI: Your MongoDB connection string
 # - JWT_SECRET: A secure random string
-# - OPENAI_API_KEY: Your OpenAI API key
+# - GOOGLE_GENAI_API_KEY: Your Google Gemini API key (get free key from https://ai.google.dev/tutorials/setup)
 ```
 
 **Example .env file:**
@@ -134,7 +134,7 @@ NODE_ENV=development
 MONGO_URI=mongodb://localhost:27017/planai
 JWT_SECRET=your_super_secret_jwt_key_here
 JWT_EXPIRE=30d
-OPENAI_API_KEY=sk-your-openai-api-key-here
+GOOGLE_GENAI_API_KEY=your_google_gemini_api_key_here
 FRONTEND_URL=http://localhost:5173
 ```
 
@@ -170,7 +170,7 @@ sudo systemctl start mongod
 cd backend
 npm run dev
 
-# Server will start on http://localhost:5000
+# Server will start on http://localhost:4000
 ```
 
 #### Start Frontend Development Server
@@ -240,6 +240,7 @@ Open your browser and navigate to: **http://localhost:5173**
 
 ### AI
 - `POST /api/ai/generate-tasks` - Generate tasks from description (protected)
+- `POST /api/ai/projects/:projectId/generate-tasks` - Generate and save project tasks (protected)
 - `POST /api/ai/generate-subtasks` - Generate subtasks (protected)
 - `POST /api/ai/analyze-delays` - Analyze overdue tasks (protected)
 - `POST /api/ai/chat` - Chat with AI assistant (protected)
@@ -257,12 +258,12 @@ Open your browser and navigate to: **http://localhost:5173**
 - Protected routes redirect to login if unauthorized
 
 ### Drag & Drop
-- Powered by `react-beautiful-dnd`
+- Powered by `@hello-pangea/dnd`
 - Real-time status updates when tasks are moved
 - Smooth animations and visual feedback
 
 ### AI Integration
-- Uses OpenAI GPT-3.5-turbo model
+- Uses Google Gemini for AI responses and task generation
 - Structured prompts for consistent outputs
 - Error handling for API failures
 
@@ -277,10 +278,10 @@ mongosh
 MONGO_URI=mongodb://localhost:27017/planai
 ```
 
-### OpenAI API Errors
-- Verify API key is valid and has credits
-- Check rate limits on OpenAI dashboard
-- Ensure API key is correctly set in .env
+### Gemini API Errors
+- Verify `GOOGLE_GENAI_API_KEY` is valid and configured in `backend/.env`
+- Check Gemini quota and rate limits in Google AI Studio
+- Restart the backend after changing the environment file
 
 ### Port Already in Use
 ```bash
@@ -304,12 +305,12 @@ taskkill /PID <PID> /F
 
 ### Backend (.env)
 ```env
-PORT=5000
+PORT=4000
 NODE_ENV=development
 MONGO_URI=mongodb://localhost:27017/planai
 JWT_SECRET=your_secret_key_here
 JWT_EXPIRE=30d
-OPENAI_API_KEY=sk-your-key-here
+GOOGLE_GENAI_API_KEY=your_google_gemini_api_key_here
 FRONTEND_URL=http://localhost:5173
 ```
 
@@ -343,7 +344,7 @@ MIT License - Feel free to use this project for learning and development.
 
 ## 🙏 Acknowledgments
 
-- OpenAI for GPT API
+- Google Gemini for AI assistance
 - MongoDB for database
 - React community for amazing tools
 - All open-source contributors

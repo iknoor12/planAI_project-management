@@ -20,6 +20,19 @@ export const generateTasks = async (projectDescription, context = '') => {
 };
 
 /**
+ * Generate and save tasks for a project using AI
+ * @param {string} projectId - Project ID
+ * @param {string} context - Additional context (optional)
+ * @returns {Promise} Saved tasks
+ */
+export const generateProjectTasks = async (projectId, context = '') => {
+  const response = await api.post(`/ai/projects/${projectId}/generate-tasks`, {
+    context,
+  });
+  return response.data;
+};
+
+/**
  * Generate subtasks for a task using AI
  * @param {string} taskTitle - Task title
  * @param {string} taskDescription - Task description (optional)

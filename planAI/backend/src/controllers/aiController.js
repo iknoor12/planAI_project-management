@@ -1,4 +1,35 @@
-import { generateTasksWithAI, generateSubtasksWithAI, analyzeTaskDelaysWithAI } from '../services/aiService.js';
+import {
+  generateTasksWithAI,
+  generateSubtasksWithAI,
+  analyzeTaskDelaysWithAI,
+  chatWithAI,
+} from '../services/aiService.js';
+import { GeminiRequestError } from '../config/gemini.js';
+import Project from '../models/Project.js';
+import Task from '../models/Task.js';
+
+const normalizeTitle = (title) => title.trim().toLowerCase();
+
+const geminiErrorResponse = (error, res, fallbackMessage) => {
+  if (error instanceof GeminiRequestError) {
+    const messages = {
+      rate_limit: 'Gemini is temporarily rate-limited. Please try again shortly.',
+      authentication: 'Gemini authentication failed. Check the backend API key.',
+      invalid_request: 'Gemini rejected the request. Please try again.',
+      model_error: 'The configured Gemini model is unavailable.',
+      service_unavailable: 'Gemini is temporarily unavailable. Please try again shortly.',
+      empty_response: 'Gemini returned an empty response. Please try again.',
+      provider_error: 'Gemini could not process the request. Please try again shortly.',
+    };
+
+    return res.status(error.statusCode).json({
+      message: messages[error.category] || messages.provider_error,
+      category: error.category,
+    });
+  }
+
+  return res.status(500).json({ message: fallbackMessage });
+};
 
 /**
  * @route   POST /api/ai/generate-tasks
@@ -12,15 +43,87 @@ export const generateTasks = async (req, res) => {
       return res.status(400).json({ message: 'Please provide a project description' });
     }
 
-    const tasks = await generateTasksWithAI(projectDescription, context);
+    const result = await generateTasksWithAI(projectDescription, context);
 
-    res.json({ tasks });
+    res.json(result);
   } catch (error) {
     console.error('Generate tasks error:', error);
-    res.status(500).json({ 
-      message: 'Server error generating tasks', 
-      error: error.message 
-    });
+    return geminiErrorResponse(error, res, 'Server error generating tasks');
+  }
+};
+
+/**
+ * @route   POST /api/ai/projects/:projectId/generate-tasks
+ * @access  Private
+ */
+export const generateProjectTasks = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { context = '' } = req.body;
+    const project = await Project.findById(projectId);
+
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    if (!project.members.some((member) => member.equals(req.user._id))) {
+      return res.status(403).json({ message: 'Not authorized to access this project' });
+    }
+
+    const projectInput = `Project name: ${project.name}\nProject description: ${project.description || ''}`;
+    const result = await generateTasksWithAI(projectInput, context);
+
+    if (!result || !Array.isArray(result.tasks) || result.tasks.length === 0) {
+      return res.status(502).json({ message: 'Gemini returned no project tasks' });
+    }
+
+    const existingTasks = await Task.find({ project: project._id })
+      .select('title position')
+      .lean();
+    const existingTitles = new Set(existingTasks.map((task) => normalizeTitle(task.title)));
+    const generatedTitles = new Set();
+    const tasksToInsert = [];
+    const highestPosition = existingTasks.reduce(
+      (max, task) => Math.max(max, Number.isFinite(task.position) ? task.position : -1),
+      -1
+    );
+
+    for (const generatedTask of result.tasks) {
+      if (!generatedTask || typeof generatedTask.title !== 'string' || !generatedTask.title.trim()) {
+        return res.status(502).json({ message: 'Gemini returned an invalid project task' });
+      }
+
+      const title = generatedTask.title.trim();
+      const normalizedTitle = normalizeTitle(title);
+      if (existingTitles.has(normalizedTitle) || generatedTitles.has(normalizedTitle)) {
+        continue;
+      }
+
+      if (!['low', 'medium', 'high', 'urgent'].includes(generatedTask.priority)) {
+        return res.status(502).json({ message: 'Gemini returned an invalid task priority' });
+      }
+
+      generatedTitles.add(normalizedTitle);
+      tasksToInsert.push({
+        title,
+        description: typeof generatedTask.description === 'string' ? generatedTask.description : '',
+        priority: generatedTask.priority,
+        status: 'todo',
+        project: project._id,
+        createdBy: req.user._id,
+        position: highestPosition + tasksToInsert.length + 1,
+      });
+    }
+
+    if (tasksToInsert.length === 0) {
+      return res.json({ tasks: [] });
+    }
+
+    const savedTasks = await Task.insertMany(tasksToInsert);
+    res.status(201).json({ tasks: savedTasks });
+  } catch (error) {
+    console.error('Generate project tasks error:', error);
+    return geminiErrorResponse(error, res, 'Server error generating project tasks');
   }
 };
 
@@ -36,15 +139,12 @@ export const generateSubtasks = async (req, res) => {
       return res.status(400).json({ message: 'Please provide a task title' });
     }
 
-    const subtasks = await generateSubtasksWithAI(taskTitle, taskDescription);
+    const result = await generateSubtasksWithAI(taskTitle, taskDescription);
 
-    res.json({ subtasks });
+    res.json(result);
   } catch (error) {
     console.error('Generate subtasks error:', error);
-    res.status(500).json({ 
-      message: 'Server error generating subtasks', 
-      error: error.message 
-    });
+    return geminiErrorResponse(error, res, 'Server error generating subtasks');
   }
 };
 
@@ -65,10 +165,7 @@ export const analyzeDelays = async (req, res) => {
     res.json(analysis);
   } catch (error) {
     console.error('Analyze delays error:', error);
-    res.status(500).json({ 
-      message: 'Server error analyzing delays', 
-      error: error.message 
-    });
+    return geminiErrorResponse(error, res, 'Server error analyzing delays');
   }
 };
 
@@ -84,38 +181,31 @@ export const aiChat = async (req, res) => {
       return res.status(400).json({ message: 'Please provide a message' });
     }
 
-    const { default: openai } = await import('../config/openai.js');
-    if (!openai) {
-      return res.status(503).json({ 
-        message: 'AI service is not available. Please configure OPENAI_API_KEY in .env file.',
-        reply: 'AI assistant is currently unavailable. Please add your OpenAI API key to use AI features.'
+    const result = await chatWithAI(message, context);
+
+    res.json(result);
+
+  } catch (error) {
+    console.error('AI chat error:', error);
+    if (error instanceof GeminiRequestError) {
+      const messages = {
+        rate_limit: 'Gemini is temporarily rate-limited. Please try again shortly.',
+        authentication: 'Gemini authentication failed. Check the backend API key.',
+        invalid_request: 'Gemini rejected the chat request. Try a shorter message.',
+        model_error: 'The configured Gemini model is unavailable.',
+        service_unavailable: 'Gemini is temporarily unavailable. Please try again shortly.',
+        empty_response: 'Gemini returned an empty response. Please try again.',
+        provider_error: 'Gemini could not process the request. Please try again shortly.',
+      };
+
+      return res.status(error.statusCode).json({
+        message: messages[error.category] || messages.provider_error,
+        category: error.category,
       });
     }
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        {
-          role: 'system',
-          content: `You are a helpful project management assistant. Help users with task planning, project organization, and productivity tips. ${context ? `Context: ${context}` : ''}`,
-        },
-        {
-          role: 'user',
-          content: message,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 500,
-    });
-
-    const reply = completion.choices[0].message.content;
-
-    res.json({ reply });
-  } catch (error) {
-    console.error('AI chat error:', error);
-    res.status(500).json({ 
-      message: 'Server error processing chat', 
-      error: error.message 
+    res.status(500).json({
+      message: 'Server error processing chat',
     });
   }
 };

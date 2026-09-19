@@ -35,17 +35,6 @@ export const createProject = async (projectData) => {
 };
 
 /**
- * Update a project
- * @param {string} projectId - Project ID
- * @param {Object} projectData - Updated project data
- * @returns {Promise} Updated project
- */
-export const updateProject = async (projectId, projectData) => {
-  const response = await api.put(`/projects/${projectId}`, projectData);
-  return response.data;
-};
-
-/**
  * Delete a project
  * @param {string} projectId - Project ID
  * @returns {Promise} Success message

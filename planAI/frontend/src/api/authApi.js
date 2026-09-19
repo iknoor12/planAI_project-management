@@ -42,27 +42,10 @@ export const logout = () => {
 };
 
 /**
- * Get current user profile
- * @returns {Promise} User profile data
- */
-export const getProfile = async () => {
-  const response = await api.get('/auth/me');
-  return response.data;
-};
-
-/**
  * Get stored user from localStorage
  * @returns {Object|null} User object or null
  */
 export const getStoredUser = () => {
   const user = localStorage.getItem('user');
   return user ? JSON.parse(user) : null;
-};
-
-/**
- * Check if user is authenticated
- * @returns {boolean} Authentication status
- */
-export const isAuthenticated = () => {
-  return !!localStorage.getItem('token');
 };

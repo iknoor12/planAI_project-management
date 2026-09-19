@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiPlus, FiArrowLeft, FiBarChart2, FiMessageSquare } from 'react-icons/fi';
+import { FiPlus, FiArrowLeft, FiMessageSquare } from 'react-icons/fi';
 import KanbanBoard from '../components/KanbanBoard';
 import DashboardStats from '../components/DashboardStats';
 import AIChat from '../components/AIChat';
 import { getProjectById } from '../api/projectApi';
+import { generateProjectTasks } from '../api/aiApi';
 import { getTasksByProject, createTask, updateTask, deleteTask, getTaskStats } from '../api/taskApi';
 import '../styles/ProjectBoard.css';
 
@@ -16,6 +17,9 @@ const ProjectBoard = () => {
   const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [generatingTasks, setGeneratingTasks] = useState(false);
+  const [showGenerateTasksModal, setShowGenerateTasksModal] = useState(false);
+  const [taskGenerationContext, setTaskGenerationContext] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showAIChat, setShowAIChat] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -127,6 +131,45 @@ const ProjectBoard = () => {
     } catch (error) {}
   };
 
+  const closeGenerateTasksModal = () => {
+    if (generatingTasks) return;
+
+    setShowGenerateTasksModal(false);
+    setTaskGenerationContext('');
+  };
+
+  const handleGenerateTasksDialogKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      closeGenerateTasksModal();
+    }
+  };
+
+  const handleGenerateProjectTasks = async (e) => {
+    e.preventDefault();
+    if (generatingTasks) return;
+
+    setGeneratingTasks(true);
+    try {
+      const result = await generateProjectTasks(projectId, taskGenerationContext.trim());
+      await fetchProjectData();
+
+      const generatedCount = Array.isArray(result.tasks) ? result.tasks.length : 0;
+      setShowGenerateTasksModal(false);
+      setTaskGenerationContext('');
+      alert(
+        generatedCount > 0
+          ? `Generated ${generatedCount} tasks successfully.`
+          : 'No new tasks were generated.'
+      );
+    } catch (error) {
+      setShowGenerateTasksModal(false);
+      setTaskGenerationContext('');
+      alert(error.response?.data?.message || 'Failed to generate tasks.');
+    } finally {
+      setGeneratingTasks(false);
+    }
+  };
+
   if (loading) {
     return <div className="loading">Loading project...</div>;
   }
@@ -146,6 +189,13 @@ const ProjectBoard = () => {
         <div className="header-actions">
           <button onClick={() => setShowAIChat(!showAIChat)} className="btn-ai">
             <FiMessageSquare /> AI Assistant
+          </button>
+          <button
+            onClick={() => setShowGenerateTasksModal(true)}
+            className="btn-ai"
+            disabled={generatingTasks}
+          >
+            {generatingTasks ? 'Generating...' : 'Generate Tasks with AI'}
           </button>
           <button onClick={() => {
             setEditingTask(null);
@@ -266,6 +316,52 @@ const ProjectBoard = () => {
                 </button>
                 <button type="submit" className="btn-primary">
                   {editingTask ? 'Update Task' : 'Create Task'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showGenerateTasksModal && (
+        <div className="modal-overlay" onClick={closeGenerateTasksModal}>
+          <div
+            className="modal ai-task-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="generate-tasks-title"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={handleGenerateTasksDialogKeyDown}
+          >
+            <h2 id="generate-tasks-title">Generate Tasks with AI</h2>
+            <p className="ai-task-project">Project: {project.name}</p>
+            <form onSubmit={handleGenerateProjectTasks}>
+              <div className="form-group">
+                <label htmlFor="task-generation-context">
+                  Additional instructions (optional)
+                </label>
+                <textarea
+                  id="task-generation-context"
+                  value={taskGenerationContext}
+                  onChange={(e) => setTaskGenerationContext(e.target.value)}
+                  placeholder="Generate frontend and API integration tasks only"
+                  rows="4"
+                  autoFocus
+                  disabled={generatingTasks}
+                />
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  onClick={closeGenerateTasksModal}
+                  className="btn-secondary"
+                  disabled={generatingTasks}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary" disabled={generatingTasks}>
+                  {generatingTasks ? 'Generating...' : 'Generate'}
                 </button>
               </div>
             </form>

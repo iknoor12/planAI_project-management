@@ -124,3 +124,13 @@
 .task-modal {
   max-width: 600px;
 }
+
+.ai-task-modal {
+  max-width: 520px;
+}
+
+.ai-task-project {
+  margin: -0.75rem 0 1.5rem;
+  color: #6b7280;
+  font-size: 0.95rem;
+}

@@ -16,16 +16,6 @@ export const getTasksByProject = async (projectId) => {
 };
 
 /**
- * Get single task by ID
- * @param {string} taskId - Task ID
- * @returns {Promise} Task data
- */
-export const getTaskById = async (taskId) => {
-  const response = await api.get(`/tasks/${taskId}`);
-  return response.data;
-};
-
-/**
  * Create a new task
  * @param {Object} taskData - Task data
  * @returns {Promise} Created task
