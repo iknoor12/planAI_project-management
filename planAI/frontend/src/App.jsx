@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ProjectBoard from './pages/ProjectBoard';
+import PublicProject from './pages/PublicProject';
 import './styles/App.css';
 
 const ProtectedRoute = ({ children }) => {
@@ -48,6 +49,7 @@ function App() {
               </PublicRoute>
             }
           />
+          <Route path="/shared/project/:token" element={<PublicProject />} />
 
           {/* Protected Routes */}
           <Route
@@ -60,6 +62,22 @@ function App() {
           />
           <Route
             path="/project/:projectId"
+            element={
+              <ProtectedRoute>
+                <ProjectBoard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/project/:projectId/analytics"
+            element={
+              <ProtectedRoute>
+                <ProjectBoard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/project/:projectId/related"
             element={
               <ProtectedRoute>
                 <ProjectBoard />

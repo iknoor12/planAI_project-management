@@ -1,9 +1,5 @@
 import User from '../models/User.js';
-import { generateToken } from '../middleware/authMiddleware.js';
-
-const normalizeEmail = (email) => (
-  typeof email === 'string' ? email.trim().toLowerCase() : ''
-);
+import { generateToken, normalizeEmail } from '../middleware/authMiddleware.js';
 
 /**
  * @route   POST /api/auth/register

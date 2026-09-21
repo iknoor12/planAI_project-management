@@ -73,3 +73,8 @@ export const chatWithAI = async (message, context = '') => {
   });
   return response.data;
 };
+
+export const explainNote = async (noteId) => {
+  const response = await api.post(`/ai/notes/${noteId}/explain`);
+  return response.data;
+};

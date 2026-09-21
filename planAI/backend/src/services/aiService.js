@@ -1,4 +1,4 @@
-import { generateText } from '../config/gemini.js';
+import { generateText, GeminiRequestError } from '../config/gemini.js';
 
 const parseJsonArray = (text, itemName) => {
   const cleaned = text
@@ -74,6 +74,9 @@ Return only a JSON array. Each task must use only these fields:
 
   } catch (error) {
     console.error('AI task generation error:', error.message);
+    if (error instanceof GeminiRequestError) {
+      throw error;
+    }
     throw new Error(error.message || 'AI task generation failed');
   }
 };

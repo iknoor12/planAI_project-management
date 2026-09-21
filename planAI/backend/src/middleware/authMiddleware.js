@@ -1,6 +1,35 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
+export const normalizeEmail = (email) => (
+  typeof email === 'string' ? email.trim().toLowerCase() : ''
+);
+
+const objectIdMatches = (candidate, userId) => {
+  if (!candidate || !userId) {
+    return false;
+  }
+
+  const candidateId = candidate._id ? candidate._id.toString() : candidate.toString();
+  return candidateId === userId.toString();
+};
+
+export const isProjectMember = (project, userId) => {
+  if (!project || !userId || !Array.isArray(project.members)) {
+    return false;
+  }
+
+  return project.members.some((member) => objectIdMatches(member, userId));
+};
+
+export const isProjectOwner = (project, userId) => {
+  if (!project || !userId) {
+    return false;
+  }
+
+  return objectIdMatches(project.owner, userId);
+};
+
 /**
  * Authentication Middleware
  * Protects routes by verifying JWT tokens

@@ -4,7 +4,10 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
+import noteRoutes from './routes/noteRoutes.js';
+import fileRoutes from './routes/fileRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import publicProjectRoutes from './routes/publicProjectRoutes.js';
 
 // import invokeGemini from './config/gemini.js';
 
@@ -20,7 +23,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/notes', noteRoutes);
+app.use('/api/files', fileRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/public/projects', publicProjectRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });

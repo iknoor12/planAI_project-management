@@ -24,6 +24,31 @@ export const getProjectById = async (projectId) => {
   return response.data;
 };
 
+export const getProjectAnalytics = async (projectId) => {
+  const response = await api.get(`/projects/${projectId}/analytics`);
+  return response.data;
+};
+
+export const getProjectSharing = async (projectId) => {
+  const response = await api.get(`/projects/${projectId}/share`);
+  return response.data;
+};
+
+export const enableProjectSharing = async (projectId) => {
+  const response = await api.post(`/projects/${projectId}/share`);
+  return response.data;
+};
+
+export const disableProjectSharing = async (projectId) => {
+  const response = await api.delete(`/projects/${projectId}/share`);
+  return response.data;
+};
+
+export const getPublicProjectByToken = async (token) => {
+  const response = await api.get(`/public/projects/share/${encodeURIComponent(token)}`);
+  return response.data;
+};
+
 /**
  * Create a new project
  * @param {Object} projectData - Project data
@@ -31,6 +56,28 @@ export const getProjectById = async (projectId) => {
  */
 export const createProject = async (projectData) => {
   const response = await api.post('/projects', projectData);
+  return response.data;
+};
+
+/**
+ * Add a new member to a project by email
+ * @param {string} projectId - Project ID
+ * @param {string} email - User email to add
+ * @returns {Promise} Updated project
+ */
+export const addProjectMember = async (projectId, email) => {
+  const response = await api.post(`/projects/${projectId}/members`, { email });
+  return response.data;
+};
+
+/**
+ * Remove a member from a project
+ * @param {string} projectId - Project ID
+ * @param {string} memberId - Member user ID
+ * @returns {Promise} Updated project
+ */
+export const removeProjectMember = async (projectId, memberId) => {
+  const response = await api.delete(`/projects/${projectId}/members/${memberId}`);
   return response.data;
 };
 

@@ -1,5 +1,24 @@
 import Task from '../models/Task.js';
 import Project from '../models/Project.js';
+import mongoose from 'mongoose';
+import { isProjectMember } from '../middleware/authMiddleware.js';
+
+const validateAssignee = (project, assignedTo) => {
+  if (assignedTo === undefined || assignedTo === null || assignedTo === '') {
+    return null;
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(assignedTo)) {
+    return { status: 400, message: 'Invalid assignee ID' };
+  }
+
+  const isMember = project.members.some((member) => String(member) === String(assignedTo));
+  if (!isMember) {
+    return { status: 400, message: 'Assignee must be a member of this project' };
+  }
+
+  return assignedTo;
+};
 
 /**
  * @route   GET /api/tasks/project/:projectId
@@ -14,7 +33,7 @@ export const getTasksByProject = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    if (!project.members.some((member) => member.equals(req.user._id))) {
+    if (!isProjectMember(project, req.user._id)) {
       return res.status(403).json({ message: 'Not authorized to access this project' });
     }
 
@@ -46,7 +65,7 @@ export const getTaskById = async (req, res) => {
     }
 
     const project = await Project.findById(task.project._id);
-    if (!project.members.some((member) => member.equals(req.user._id))) {
+    if (!isProjectMember(project, req.user._id)) {
       return res.status(403).json({ message: 'Not authorized to access this task' });
     }
 
@@ -74,8 +93,13 @@ export const createTask = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    if (!projectDoc.members.some((member) => member.equals(req.user._id))) {
+    if (!isProjectMember(projectDoc, req.user._id)) {
       return res.status(403).json({ message: 'Not authorized to create tasks in this project' });
+    }
+
+    const validatedAssignee = validateAssignee(projectDoc, assignedTo);
+    if (validatedAssignee?.status) {
+      return res.status(validatedAssignee.status).json({ message: validatedAssignee.message });
     }
 
     const task = await Task.create({
@@ -85,7 +109,7 @@ export const createTask = async (req, res) => {
       priority: priority || 'medium',
       dueDate,
       project,
-      assignedTo: assignedTo || null,
+      assignedTo: validatedAssignee,
       createdBy: req.user._id,
       subtasks: subtasks || [],
     });
@@ -114,18 +138,23 @@ export const updateTask = async (req, res) => {
     }
 
     const project = await Project.findById(task.project);
-    if (!project.members.some((member) => member.equals(req.user._id))) {
+    if (!isProjectMember(project, req.user._id)) {
       return res.status(403).json({ message: 'Not authorized to update this task' });
     }
 
     const { title, description, status, priority, dueDate, assignedTo, subtasks, position } = req.body;
+
+    const validatedAssignee = validateAssignee(project, assignedTo);
+    if (validatedAssignee?.status) {
+      return res.status(validatedAssignee.status).json({ message: validatedAssignee.message });
+    }
 
     task.title = title !== undefined ? title : task.title;
     task.description = description !== undefined ? description : task.description;
     task.status = status !== undefined ? status : task.status;
     task.priority = priority !== undefined ? priority : task.priority;
     task.dueDate = dueDate !== undefined ? dueDate : task.dueDate;
-    task.assignedTo = assignedTo !== undefined ? assignedTo : task.assignedTo;
+    task.assignedTo = assignedTo !== undefined ? validatedAssignee : task.assignedTo;
     task.subtasks = subtasks !== undefined ? subtasks : task.subtasks;
     task.position = position !== undefined ? position : task.position;
 
@@ -155,7 +184,7 @@ export const deleteTask = async (req, res) => {
     }
 
     const project = await Project.findById(task.project);
-    if (!project.members.some((member) => member.equals(req.user._id))) {
+    if (!isProjectMember(project, req.user._id)) {
       return res.status(403).json({ message: 'Not authorized to delete this task' });
     }
 
@@ -181,7 +210,7 @@ export const getTaskStats = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    if (!project.members.some((member) => member.equals(req.user._id))) {
+    if (!isProjectMember(project, req.user._id)) {
       return res.status(403).json({ message: 'Not authorized to access this project' });
     }
 

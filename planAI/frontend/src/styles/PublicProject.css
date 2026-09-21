@@ -1,0 +1,202 @@
+.public-project-page {
+  min-height: 100vh;
+  background: #f5f7fa;
+  color: #1f2937;
+}
+
+.public-project-header {
+  padding: 4.5rem 2rem 4rem;
+  background: linear-gradient(135deg, #172554 0%, #1d4ed8 62%, #0f766e 100%);
+  color: white;
+}
+
+.public-project-header > * {
+  width: min(900px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.public-project-mark,
+.public-project-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #bfdbfe;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-project-header h1 {
+  margin-top: 0.85rem;
+  font-size: clamp(2.1rem, 5vw, 4rem);
+  line-height: 1.05;
+}
+
+.public-project-header p {
+  max-width: 680px;
+  margin-top: 1rem;
+  color: #dbeafe;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.public-project-tasks {
+  width: min(900px, calc(100% - 2rem));
+  margin: -2rem auto 0;
+  padding: 1.5rem;
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+
+.public-project-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.public-project-section-heading h2 {
+  margin-top: 0.3rem;
+  font-size: 1.5rem;
+}
+
+.public-project-eyebrow {
+  color: #2563eb;
+}
+
+.public-project-task-count {
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.public-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.public-task-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.public-task-item h3 {
+  overflow-wrap: anywhere;
+  font-size: 1rem;
+}
+
+.public-task-icon {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.public-task-icon.done {
+  background: #dcfce7;
+  color: #059669;
+}
+
+.public-task-status {
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.public-task-status.status-done {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.public-task-status.status-in-progress {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.public-project-empty,
+.public-project-state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.public-project-empty {
+  padding: 3rem 1rem;
+}
+
+.public-project-empty h3,
+.public-project-state-card h1 {
+  color: #1f2937;
+}
+
+.public-project-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 2rem;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.public-project-state {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+  background: #f5f7fa;
+}
+
+.public-project-state-card {
+  max-width: 480px;
+  padding: 2.5rem 2rem;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.public-project-state-card p {
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .public-project-header {
+    padding: 3rem 1.25rem 3.5rem;
+  }
+
+  .public-project-tasks {
+    width: calc(100% - 1.5rem);
+    padding: 1rem;
+  }
+
+  .public-task-item {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .public-task-status {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

@@ -27,6 +27,17 @@ const projectSchema = new mongoose.Schema(
       type: String,
       default: '#3b82f6',
     },
+    publicSharingEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    publicShareToken: {
+      type: String,
+      default: null,
+      select: false,
+      unique: true,
+      sparse: true,
+    },
   },
   {
     timestamps: true,

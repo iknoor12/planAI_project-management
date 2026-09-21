@@ -5,6 +5,7 @@ import {
   generateSubtasks,
   analyzeDelays,
   aiChat,
+  explainNote,
 } from '../controllers/aiController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -22,5 +23,6 @@ router.post('/projects/:projectId/generate-tasks', generateProjectTasks);
 router.post('/generate-subtasks', generateSubtasks);
 router.post('/analyze-delays', analyzeDelays);
 router.post('/chat', aiChat);
+router.post('/notes/:noteId/explain', explainNote);
 
 export default router;
