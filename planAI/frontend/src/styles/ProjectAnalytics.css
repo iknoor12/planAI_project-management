@@ -44,7 +44,7 @@
 .analytics-summary {
   display: grid;
   grid-template-columns: repeat(8, minmax(0, 1fr));
-  gap: 0.85rem;
+  gap: 1.1rem;
   margin-bottom: 1.5rem;
 }
 

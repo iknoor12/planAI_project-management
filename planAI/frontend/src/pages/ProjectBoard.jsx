@@ -126,16 +126,8 @@ const ProjectBoard = () => {
     try {
       const notesData = await getNotesByProject(projectId);
       setNotes(notesData);
-
-      if (!selectedNoteId && notesData.length > 0) {
-        setSelectedNoteId(notesData[0]._id);
-        setNoteForm({ title: notesData[0].title, content: notesData[0].content || '' });
-      }
-
-      if (!notesData.length) {
-        setSelectedNoteId('');
-        setNoteForm({ title: '', content: '' });
-      }
+      setSelectedNoteId('');
+      setNoteForm({ title: '', content: '' });
     } catch (error) {
       setNoteError(error.response?.data?.message || 'Failed to load notes.');
     } finally {
@@ -317,6 +309,8 @@ const ProjectBoard = () => {
     setNoteForm({ title: '', content: '' });
     setNoteError('');
     setNoteSuccess('');
+    setNoteExplanation('');
+    setNoteExplanationError('');
   };
 
   const selectNote = (note) => {
@@ -380,7 +374,7 @@ const ProjectBoard = () => {
         setNotes((current) => [createdNote, ...current]);
         setSelectedNoteId(createdNote._id);
         setShowCreateNote(false);
-        setNoteForm({ title: createdNote.title, content: createdNote.content || '' });
+        setNoteForm({ title: createdNote.title, content: '' });
         setNoteSuccess('Note created successfully.');
       }
     } catch (error) {
@@ -614,7 +608,7 @@ const ProjectBoard = () => {
         </div>
       </header>
 
-      <div className="project-workspace">
+      <div className={"project-workspace" + (showAIChat ? " project-workspace-ai-open" : "")}>
         <aside className="project-sidebar" aria-label="Project sections">
           <button
             type="button"
@@ -948,6 +942,7 @@ const ProjectBoard = () => {
                 )}
 
                 <MarkdownEditor
+                  key={selectedNoteId || 'new-note'}
                   value={noteForm.content}
                   onChange={(content) => setNoteForm({ ...noteForm, content })}
                 />
@@ -987,19 +982,20 @@ const ProjectBoard = () => {
       </div>
           )}
 
-          {showAIChat && (
-            <div className="ai-panel ai-panel-shared">
-              <div className="ai-panel-header">
-                <h3>AI Assistant</h3>
-                <button onClick={() => setShowAIChat(false)}>×</button>
-              </div>
-              <AIChat
-                projectContext={`Project: ${project.name}. ${project.description}`}
-                onTasksGenerated={handleTasksGenerated}
-              />
-            </div>
-          )}
         </main>
+
+        {showAIChat && (
+          <div className="ai-panel ai-panel-shared">
+            <div className="ai-panel-header">
+              <h3>AI Assistant</h3>
+              <button onClick={() => setShowAIChat(false)}>×</button>
+            </div>
+            <AIChat
+              projectContext={`Project: ${project.name}. ${project.description}`}
+              onTasksGenerated={handleTasksGenerated}
+            />
+          </div>
+        )}
       </div>
 
       {showTaskModal && (

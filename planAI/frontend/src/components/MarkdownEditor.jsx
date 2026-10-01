@@ -10,27 +10,29 @@ const MarkdownEditor = ({ value, onChange, placeholder = 'Write Markdown here...
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder={placeholder}
-          rows={14}
+          rows={10}
         />
       </div>
 
       <div className="markdown-pane">
         <label>Preview</label>
         <div className="markdown-preview">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              a: ({ node, ...props }) => (
-                <a
-                  {...props}
-                  target={props.href?.startsWith('http') ? '_blank' : undefined}
-                  rel={props.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
-                />
-              ),
-            }}
-          >
-            {value || 'Preview will appear here.'}
-          </ReactMarkdown>
+          {value ? (
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                a: ({ node, ...props }) => (
+                  <a
+                    {...props}
+                    target={props.href?.startsWith('http') ? '_blank' : undefined}
+                    rel={props.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  />
+                ),
+              }}
+            >
+              {value}
+            </ReactMarkdown>
+          ) : null}
         </div>
       </div>
     </div>

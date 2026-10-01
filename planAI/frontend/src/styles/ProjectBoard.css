@@ -102,6 +102,17 @@
   overflow: hidden;
 }
 
+.project-workspace-ai-open {
+  display: grid;
+  grid-template-columns: 224px minmax(0, 1fr) minmax(320px, 360px);
+  align-items: stretch;
+}
+
+.project-workspace-ai-open .project-content {
+  width: auto;
+  flex: initial;
+}
+
 .project-sidebar {
   width: 224px;
   flex-shrink: 0;
@@ -267,6 +278,8 @@
 
 .member-form-row input {
   flex: 1;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.9em;
 }
 
 .member-empty,
@@ -433,7 +446,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: 2rem;
   margin-bottom: 0.75rem;
 }
 
@@ -444,8 +457,8 @@
 }
 
 .file-preview-image {
-  width: 100%;
-  max-height: 420px;
+  width: 90%;
+  max-height: 320px;
   object-fit: contain;
   border-radius: 10px;
   background: white;
@@ -529,7 +542,7 @@
 
 .notes-content {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 260px minmax(0, 1fr);
   gap: 1rem;
 }
 
@@ -577,6 +590,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-width: 0;
 }
 
 .note-editor-header {
@@ -637,15 +651,19 @@
 }
 
 .markdown-editor {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .markdown-pane {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .markdown-pane label {
@@ -655,20 +673,31 @@
 
 .markdown-pane textarea,
 .markdown-preview {
-  min-height: 300px;
+  height: 240px;
+  min-height: 180px;
   border: 1px solid #d1d5db;
   border-radius: 10px;
   padding: 1rem;
   background: #ffffff;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  overflow-y: auto;
 }
 
 .markdown-pane textarea {
   resize: vertical;
+  max-height: 360px;
   font-family: monospace;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .markdown-preview {
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .markdown-preview h1,
@@ -697,6 +726,8 @@
   padding: 1rem;
   border-radius: 8px;
   overflow-x: auto;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .markdown-preview code {
@@ -753,7 +784,11 @@
 }
 
 .ai-panel-shared {
-  margin: 0 2rem 2rem;
+  width: auto;
+  min-width: 0;
+  height: 100%;
+  max-height: none;
+  margin: 0;
 }
 
 .ai-panel-header {
@@ -799,6 +834,12 @@
   margin: -0.75rem 0 1.5rem;
   color: #6b7280;
   font-size: 0.95rem;
+}
+
+@media (max-width: 960px) and (min-width: 761px) {
+  .project-workspace-ai-open {
+    grid-template-columns: 224px minmax(0, 1fr) 320px;
+  }
 }
 
 @media (max-width: 760px) {
@@ -849,9 +890,37 @@
     min-width: 760px;
   }
 
+  .project-workspace-ai-open {
+    display: flex;
+    position: relative;
+  }
+
+  .project-workspace-ai-open .project-content {
+    width: 100%;
+  }
+
   .ai-panel-shared {
-    width: auto;
-    margin-left: 1rem;
-    margin-right: 1rem;
+    position: absolute;
+    z-index: 5;
+    top: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    width: min(360px, calc(100% - 1.5rem));
+    height: auto;
+    margin: 0;
+  }
+
+  .notes-content {
+    grid-template-columns: 1fr;
+  }
+
+  .notes-sidebar {
+    max-height: 180px;
+  }
+
+  .markdown-pane textarea,
+  .markdown-preview {
+    height: 200px;
+    min-height: 140px;
   }
 }

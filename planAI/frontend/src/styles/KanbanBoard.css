@@ -12,7 +12,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 300px);
+  max-height: calc(200vh - 300px);
 }
 
 .column-header {
@@ -27,7 +27,7 @@
 }
 
 .column-header h3 {
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: #1f2937;
   font-weight: 600;
 }
@@ -45,7 +45,7 @@
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
-  min-height: 200px;
+  max-height: 100em;
 }
 
 .column-content.dragging-over {
